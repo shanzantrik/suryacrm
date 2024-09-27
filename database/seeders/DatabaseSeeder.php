@@ -16,6 +16,6 @@ class DatabaseSeeder extends Seeder
         // User::factory(10)->create();
 
         // Call the MembersTableSeeder
-        $this->call(MembersTableSeeder::class);
+        $this->call(StateDistrictSeeder::class);
     }
 }

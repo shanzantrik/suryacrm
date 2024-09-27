@@ -3,6 +3,12 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\SubCategoryController;
+use App\Http\Controllers\StateController;
+use App\Http\Controllers\DistrictController;
+use App\Http\Controllers\HolidayController;
+
 
 Route::get('/', function () {
     return redirect('/login');
@@ -11,7 +17,16 @@ Route::get('/', function () {
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware('auth');
-
+// Protect all the other routes
+Route::middleware('auth')->group(function () {
+    Route::resource('categories', CategoryController::class);
+    Route::resource('subcategories', SubCategoryController::class);
+    Route::resource('states', StateController::class);
+    Route::resource('districts', DistrictController::class);
+    Route::get('holidays/calendar-data', [HolidayController::class, 'getHolidaysForCalendar']);
+    Route::resource('holidays', HolidayController::class);
+    Route::get('get-subcategories-by-category/{category_id}', [HolidayController::class, 'getSubcategoriesByCategory']);
+});
 // Authentication routes
 Auth::routes();
 

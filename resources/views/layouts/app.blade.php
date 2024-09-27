@@ -4,9 +4,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CRM Dashboard</title>
+  <meta name="csrf-token" content="{{ csrf_token() }}">
+  <title>{{ config('app.name', 'Laravel') }}</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css">
   <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+  <link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+
   <style>
     /* Overall Layout */
     body {
@@ -26,7 +29,7 @@
       width: 100%;
       position: sticky;
       /* Sticky positioning */
-      top: 60px;
+      top: 50px;
       /* Sticky below the header-bar */
       z-index: 999;
       /* Make sure it's above the content */
@@ -131,9 +134,9 @@
 
     /* Main Content */
     .content-wrapper {
-      padding: 20px;
-      margin-top: 40px;
-      margin-left: 30%;
+      padding: 0px;
+      margin-top: 30px;
+      margin-left: 0%;
     }
 
     /* Footer */
@@ -248,7 +251,6 @@
   <div id="app">
 
     <div class="main-layout">
-      <!-- Top Blue Bar with Logo and Navigation Menu -->
       <!-- New Blue Bar with Application Title -->
       <header class="header-bar">
         <h4>CUSTOMER RELATIONSHIP MANAGEMENT APPLICATION</h4>
@@ -260,9 +262,9 @@
         </div>
         <div>
         </div>
-        <nav>
-          <a href="#">Dashboard</a>
-          <a href="#">Master Entry</a>
+        {{-- <nav>
+          <a href="{{ route('home') }}">Dashboard</a>
+          <a href="{{ route('categories.index') }}">Master Entry</a>
           <a href="#">Member Management</a>
           <a href="#">Activity Panel</a>
           <a href="#">Admin Setting</a>
@@ -276,6 +278,88 @@
           <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
             @csrf
           </form>
+        </nav> --}}
+        <nav class="navbar navbar-expand-md navbar-light">
+          <div class="container">
+            <a class="navbar-brand" href="{{ url('/') }}">
+              {{ config('app.name', 'Laravel') }}
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+              data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
+              aria-label="{{ __('Toggle navigation') }}">
+              <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+              <!-- Left Side Of Navbar -->
+              <ul class="navbar-nav me-auto">
+                <!-- Master Entry Dropdown -->
+                <li class="nav-item dropdown">
+                  <a id="masterEntryDropdown" class="nav-link dropdown-toggle" href="#" role="button"
+                    data-bs-toggle="dropdown" aria-haspopup="false" aria-expanded="true">
+                    Master Entry
+                  </a>
+
+                  <div class="dropdown-menu" aria-labelledby="masterEntryDropdown">
+                    <!-- Category Dropdown Item -->
+                    <a class="dropdown-item" href="{{ route('categories.index') }}">
+                      Categories
+                    </a>
+                    <!-- SubCategory Dropdown Item -->
+                    <a class="dropdown-item" href="{{ route('subcategories.index') }}">
+                      SubCategories
+                    </a>
+                    <a class="dropdown-item" href="{{ route('states.index') }}">
+                      States Master
+                    </a>
+                    <a class="dropdown-item" href="{{ route('districts.index') }}">
+                      Districts Master
+                    </a>
+                    <a class="dropdown-item" href="{{ route('holidays.index') }}">
+                      Holidays Master
+                    </a>
+
+                  </div>
+                </li>
+              </ul>
+
+              <!-- Right Side Of Navbar -->
+              <ul class="navbar-nav ms-auto">
+                <!-- Authentication Links -->
+                @guest
+                @if (Route::has('login'))
+                <li class="nav-item">
+                  <a class="nav-link" href="{{ route('login') }}">{{ __('Login') }}</a>
+                </li>
+                @endif
+
+                @if (Route::has('register'))
+                <li class="nav-item">
+                  <a class="nav-link" href="{{ route('register') }}">{{ __('Register') }}</a>
+                </li>
+                @endif
+                @else
+                <li class="nav-item dropdown">
+                  <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button"
+                    data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    {{ Auth::user()->name }}
+                  </a>
+
+                  <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                    <a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault();
+                                                     document.getElementById('logout-form').submit();">
+                      {{ __('Logout') }}
+                    </a>
+
+                    <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                      @csrf
+                    </form>
+                  </div>
+                </li>
+                @endguest
+              </ul>
+            </div>
+          </div>
         </nav>
       </header>
 
@@ -306,6 +390,25 @@
         </nav>
       </header>
       @endif
+      <!-- Breadcrumb -->
+      @if (!in_array(Route::currentRouteName(), ['login', 'register', 'password.request', 'password.reset']))
+      <div class="container mt-3">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url('/') }}">Home</a></li>
+            @foreach(\App\Helpers\BreadcrumbHelper::generate() as $breadcrumb)
+            @if (!$loop->last)
+            <li class="breadcrumb-item">
+              <a href="{{ url($breadcrumb['url']) }}">{{ $breadcrumb['name'] }}</a>
+            </li>
+            @else
+            <li class="breadcrumb-item active" aria-current="page">{{ $breadcrumb['name'] }}</li>
+            @endif
+            @endforeach
+          </ol>
+        </nav>
+      </div>
+      @endif
       <!-- Main Content Wrapper -->
       <div class="content-wrapper">
         @yield('content')
@@ -324,6 +427,14 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.min.js"></script>
   <!-- Scripts -->
   <script src="{{ asset('js/app.js') }}"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+  <!-- Bootstrap Datepicker CSS and JS -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css"
+    rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js">
+  </script>
 </body>
 
 </html>

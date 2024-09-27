@@ -18,7 +18,7 @@
       </thead>
       <tbody>
         <tr>
-          <td>XYZ</td>
+          <td>Radhe Shyam</td>
           <td>00-00-0000</td>
           <td>00000-00000</td>
           <td>xyz@suryagoldcement.com</td>

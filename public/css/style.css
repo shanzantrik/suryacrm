@@ -1,0 +1,8 @@
+.breadcrumb {
+    background: none;
+    margin-bottom: 20px;
+}
+
+.breadcrumb-item a {
+    text-decoration: none;
+}
