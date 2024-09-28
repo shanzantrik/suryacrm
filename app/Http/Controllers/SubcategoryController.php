@@ -34,7 +34,6 @@ class SubCategoryController extends Controller
         return view('subcategories.index', compact('categories'));
     }
 
-    // Store a new subcategory
     public function store(Request $request)
     {
         $request->validate([
@@ -46,14 +45,12 @@ class SubCategoryController extends Controller
         return response()->json(['success' => 'SubCategory created successfully.']);
     }
 
-    // Fetch subcategory for editing
     public function edit($id)
     {
-        $subCategory = SubCategory::find($id);
+        $subCategory = SubCategory::findOrFail($id); // Ensure the subcategory exists
         return response()->json($subCategory);
     }
 
-    // Update the subcategory
     public function update(Request $request, $id)
     {
         $request->validate([
@@ -61,19 +58,14 @@ class SubCategoryController extends Controller
             'category_id' => 'required|exists:categories,id',
         ]);
 
-        $subCategory = SubCategory::find($id);
+        $subCategory = SubCategory::findOrFail($id); // Ensure the subcategory exists
         $subCategory->update($request->all());
         return response()->json(['success' => 'SubCategory updated successfully.']);
     }
 
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Subcategory $subcategory)
+    public function destroy(SubCategory $subcategory) // Ensure correct model reference
     {
         $subcategory->delete();
-
         return redirect()->route('subcategories.index')
             ->with('success', 'SubCategory deleted successfully.');
     }
