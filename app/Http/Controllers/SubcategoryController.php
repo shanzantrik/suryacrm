@@ -70,7 +70,7 @@ class SubCategoryController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(subcategory $subcategory)
+    public function destroy(Subcategory $subcategory)
     {
         $subcategory->delete();
 
