@@ -36,6 +36,7 @@
           <form id="subCategoryForm">
             @csrf
             <input type="hidden" id="subCategory_id">
+            <input type="hidden" name="_method" value="PUT"> <!-- Ensure PUT method is sent during update -->
 
             <div class="form-group">
               <label for="name">SubCategory Name</label>
@@ -69,6 +70,13 @@
 <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
 <script type="text/javascript">
   $(document).ready(function() {
+    // Set CSRF token for all AJAX requests
+    $.ajaxSetup({
+      headers: {
+        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+      }
+    });
+
     // Initialize DataTables
     $('#subcategories-table').DataTable({
         processing: true,
@@ -86,6 +94,7 @@
     $('#createNewSubCategory').click(function() {
         $('#subCategoryForm').trigger("reset");
         $('#subCategory_id').val('');
+        $('#_method').val('POST'); // Set the method to POST for new entries
         $('#subCategoryModalLabel').html("Create SubCategory");
         $('#saveBtn').html("Save");
         $('#subCategoryModal').modal('show');
@@ -101,7 +110,8 @@
             $('#subCategory_id').val(data.id);
             $('#name').val(data.name);
             $('#category_id').val(data.category_id);  // Set category in dropdown
-        })
+            $('#_method').val('PUT'); // Set the method to PUT for updates
+        });
     });
 
     // Save or update subcategory
@@ -109,7 +119,7 @@
         e.preventDefault();
         var formData = $(this).serialize();
         var id = $('#subCategory_id').val();
-        var method = id ? 'PUT' : 'POST';
+        var method = id ? 'PUT' : 'POST'; // Check if it's a new or existing record
         var url = id ? '{{ url("subcategories") }}/' + id : '{{ route("subcategories.store") }}';
 
         $.ajax({
